@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ใบเสนอราคา - Tiki Corp</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Sarabun', 'TH Sarabun New', Arial, sans-serif; font-size: 13px; background: #f0f0f0; color: #222; }
+  .toolbar { background: #8b2020; color: white; padding: 10px 20px; display: flex; gap: 10px; align-items: center; }
+  .toolbar button { background: white; color: #8b2020; border: none; border-radius: 4px; padding: 7px 18px; font-size: 13px; font-family: inherit; cursor: pointer; font-weight: bold; }
+  .toolbar button:hover { background: #f0d0d0; }
+  .toolbar button.secondary { background: #c0392b; color: white; }
+  .toolbar button.secondary:hover { background: #a93226; }
+  .page { background: white; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 15mm 15mm 10mm 15mm; box-shadow: 0 2px 16px rgba(0,0,0,0.15); }
+  
+  /* Header */
+  .header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+  .company-info { flex: 1; }
+  .company-name-th { font-size: 18px; font-weight: bold; color: #8b2020; }
+  .company-name-en { font-size: 14px; font-weight: bold; }
+  .company-detail { font-size: 11px; color: #555; margin-top: 2px; }
+  .doc-title-box { border: 2px solid #8b2020; border-radius: 6px; padding: 10px 20px; text-align: center; white-space: nowrap; }
+  .doc-title-box .th { font-size: 16px; font-weight: bold; }
+  .doc-title-box .en { font-size: 13px; }
+
+  /* Customer */
+  .customer-section { margin-bottom: 10px; }
+  .customer-row { display: flex; gap: 16px; margin-bottom: 4px; align-items: baseline; }
+  .field-label { font-weight: 600; white-space: nowrap; }
+  .field-input { border: none; border-bottom: 1px solid #c8a06e; outline: none; font-family: inherit; font-size: 13px; flex: 1; padding: 1px 2px; min-width: 0; }
+  .field-input:focus { border-bottom: 2px solid #8b2020; }
+  .field-short { width: 110px; flex: none; }
+  .branch-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+
+  /* Table */
+  table.items { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+  table.items th { background: #8b2020; color: white; padding: 5px 6px; font-weight: 600; font-size: 12px; }
+  table.items td { padding: 3px 5px; border-bottom: 1px solid #eee; vertical-align: top; }
+  table.items tr:nth-child(even) td { background: #fdf5f0; }
+  table.items tr:nth-child(odd) td { background: #fff; }
+  table.items td input, table.items td textarea { border: none; background: transparent; font-family: inherit; font-size: 12px; outline: none; width: 100%; resize: none; }
+  table.items td textarea { line-height: 1.4; min-height: 22px; overflow: hidden; }
+  table.items td input:focus, table.items td textarea:focus { background: #fff8f0; }
+  .col-model { width: 80px; }
+  .col-desc { }
+  .col-qty { width: 55px; text-align: center; }
+  .col-price { width: 95px; text-align: right; }
+  .col-disc { width: 65px; text-align: center; }
+  .col-total { width: 105px; text-align: right; }
+  .col-act { width: 28px; text-align: center; }
+
+  /* Summary */
+  .summary-wrap { display: flex; justify-content: flex-end; margin-top: 0; }
+  .summary-table { width: 300px; border-collapse: collapse; }
+  .summary-table td { padding: 4px 8px; border-top: 1px solid #eee; font-size: 13px; }
+  .summary-table .lbl { font-weight: 600; background: #fdf5f0; }
+  .summary-table .val { text-align: right; }
+  .summary-table .total-row td { background: #8b2020; color: white; font-weight: bold; font-size: 14px; border-top: 2px solid #8b2020; }
+  .summary-table .total-row .val { text-align: right; }
+
+  /* Words */
+  .words-row { margin-top: 4px; font-size: 12px; }
+  .words-row span { color: #8b2020; font-weight: 600; }
+
+  /* Add row button */
+  .add-row-btn { margin-top: 6px; background: #555; color: white; border: none; border-radius: 4px; padding: 4px 12px; font-size: 12px; cursor: pointer; font-family: inherit; }
+  .add-row-btn:hover { background: #333; }
+  .del-btn { color: #c00; cursor: pointer; font-size: 13px; border: none; background: none; padding: 0 3px; }
+
+  /* Footer */
+  .footer-section { display: flex; gap: 10px; margin-top: 16px; border-top: 1px solid #ddd; padding-top: 12px; }
+  .footer-box { flex: 1; border: 1px solid #ddd; border-radius: 4px; padding: 8px 10px; background: #fafafa; font-size: 12px; }
+  .footer-box .row { display: flex; gap: 6px; margin-top: 6px; align-items: baseline; }
+  .footer-box .row label { white-space: nowrap; }
+  .sig-line { border-top: 1px dashed #999; margin-top: 20px; padding-top: 4px; text-align: center; font-size: 11px; color: #666; }
+
+  @media print {
+    body { background: white; }
+    .toolbar { display: none !important; }
+    .add-row-btn { display: none !important; }
+    .del-btn { display: none !important; }
+    .page { box-shadow: none; margin: 0; padding: 10mm 12mm; width: 100%; }
+    .field-input { border-bottom: 1px solid #999; }
+    input, textarea { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar" id="toolbar">
+  <strong>ใบเสนอราคา | Tiki Corp</strong>
+  <button onclick="window.print()">🖨️ Print / Save PDF</button>
+  <button class="secondary" onclick="addRow()">+ เพิ่มแถว</button>
+  <button class="secondary" onclick="clearForm()">🗑️ เคลียร์ฟอร์ม</button>
+</div>
+
+<div class="page">
+  <!-- Header -->
+  <div class="header">
+    <div class="company-info">
+      <div class="company-name-th">บริษัท ทิกกี้คอร์ป จำกัด</div>
+      <div class="company-name-en">TIKI CORP LIMITED</div>
+      <div class="company-detail">ที่อยู่: 175/1 หมู่ 12, ซอย สุกไสว 2, ถนน บางนา-ตราด กม.13, บางพลีใหญ่, บางพลี, สมุทรปราการ 10540</div>
+      <div class="company-detail">เบอร์โทร: 02 316 8096 &nbsp; อีเมล: kanyarat@star-board.com</div>
+      <div class="company-detail">หมายเลขประจำตัวผู้เสียภาษี: 0115548003193 (สำนักงานใหญ่)</div>
+    </div>
+    <div class="doc-title-box">
+      <div class="th">ใบเสนอราคา</div>
+      <div class="en">Quotation</div>
+    </div>
+  </div>
+
+  <!-- Customer Info -->
+  <div class="customer-section">
+    <div class="customer-row">
+      <span class="field-label">นามลูกค้า</span>
+      <input class="field-input" id="custName" placeholder="ชื่อลูกค้า">
+      <span class="field-label" style="margin-left:16px;">เลขที่</span>
+      <input class="field-input field-short" id="docNo" value="1025-001">
+    </div>
+    <div class="customer-row">
+      <span class="field-label">ที่อยู่</span>
+      <input class="field-input" id="custAddr" placeholder="ที่อยู่ลูกค้า">
+      <span class="field-label" style="margin-left:16px;">วันที่</span>
+      <input class="field-input field-short" id="docDate">
+    </div>
+    <div class="branch-row">
+      <span class="field-label">เลขประจำตัวผู้เสียภาษี</span>
+      <input class="field-input" id="custTax" style="width:130px;flex:none;" placeholder="เลขภาษี">
+      <label><input type="radio" name="branch" value="main" checked onchange="toggleBranch()"> สำนักงานใหญ่</label>
+      <label><input type="radio" name="branch" value="branch" onchange="toggleBranch()"> สาขาที่</label>
+      <input class="field-input" id="branchNo" style="width:60px;flex:none;display:none;" placeholder="เลขสาขา">
+    </div>
+  </div>
+
+  <!-- Items Table -->
+  <table class="items">
+    <thead>
+      <tr>
+        <th class="col-model">Model</th>
+        <th class="col-desc">รายการ</th>
+        <th class="col-qty">จำนวน</th>
+        <th class="col-price">ราคา/หน่วย</th>
+        <th class="col-disc">ส่วนลด %</th>
+        <th class="col-total">จำนวนเงิน (บาท)</th>
+        <th class="col-act no-print"></th>
+      </tr>
+    </thead>
+    <tbody id="itemsBody"></tbody>
+  </table>
+  <button class="add-row-btn" onclick="addRow()">+ เพิ่มแถว</button>
+
+  <!-- Summary + Words -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:8px;">
+    <div class="words-row">
+      <strong>ตัวอักษร: </strong><span id="wordsDisplay">(ศูนย์บาทถ้วน)</span>
+    </div>
+    <div class="summary-wrap">
+      <table class="summary-table">
+        <tr><td class="lbl">ส่วนลด</td><td class="val" id="sumDisc">0.00</td></tr>
+        <tr><td class="lbl">รวมเป็นเงินก่อน Vat</td><td class="val" id="sumBefore">0.00</td></tr>
+        <tr><td class="lbl">ภาษีมูลค่าเพิ่ม 7%</td><td class="val" id="sumVat">0.00</td></tr>
+        <tr class="total-row"><td class="lbl">จำนวนเงินทั้งสิ้น</td><td class="val" id="sumTotal">0.00</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-section">
+    <div class="footer-box" style="flex:1.5">
+      <div>เห็นชอบและให้ดำเนินการตามเอกสารเสนอราคานี้</div>
+      <div class="row"><label>ผู้อนุมัติ</label><input class="field-input" id="approver"></div>
+      <div class="row"><label>วันที่</label><input class="field-input" id="approveDate"></div>
+    </div>
+    <div class="footer-box" style="flex:1">
+      <div class="row"><label>ผู้เสนอราคา</label><input class="field-input" id="quoter" value="Kanyarat"></div>
+      <div class="row"><label>วันที่</label><input class="field-input" id="quoteDate"></div>
+    </div>
+    <div class="footer-box" style="flex:1;text-align:center;">
+      <div>ในนาม บริษัท ทิกกี้คอร์ป จำกัด</div>
+      <div class="sig-line">ผู้มีอำนาจลงนาม</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Set today's date (Buddhist Era)
+(function(){
+  const d = new Date();
+  const day = d.getDate();
+  const mon = d.getMonth()+1;
+  const yr = d.getFullYear()+543;
+  const ds = `${day}/${mon}/${yr}`;
+  document.getElementById('docDate').value = ds;
+  document.getElementById('quoteDate').value = ds;
+})();
+
+function toggleBranch(){
+  const v = document.querySelector('input[name="branch"]:checked').value;
+  document.getElementById('branchNo').style.display = v==='branch'?'inline-block':'none';
+}
+
+// Auto-resize textarea
+function autoResize(el){
+  el.style.height='auto';
+  el.style.height=el.scrollHeight+'px';
+}
+
+let rowCount = 0;
+function addRow(){
+  rowCount++;
+  const tbody = document.getElementById('itemsBody');
+  const tr = document.createElement('tr');
+  tr.id = 'row_'+rowCount;
+  tr.innerHTML = `
+    <td class="col-model"><input oninput="recalc()" placeholder=""></td>
+    <td class="col-desc"><textarea rows="1" oninput="autoResize(this);recalc()" placeholder=""></textarea></td>
+    <td class="col-qty" style="text-align:center"><input style="text-align:center" oninput="recalc()" placeholder="0"></td>
+    <td class="col-price" style="text-align:right"><input style="text-align:right" oninput="recalc()" placeholder="0.00"></td>
+    <td class="col-disc" style="text-align:center"><input style="text-align:center" oninput="recalc()" placeholder="0"></td>
+    <td class="col-total" style="text-align:right;font-weight:600" id="lt_${rowCount}"></td>
+    <td class="col-act"><button class="del-btn" onclick="delRow('row_${rowCount}')">✕</button></td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function delRow(id){
+  const el = document.getElementById(id);
+  if(el) el.remove();
+  recalc();
+}
+
+function fmt(n){ return n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+function recalc(){
+  const rows = document.querySelectorAll('#itemsBody tr');
+  let totalInc=0, totalDisc=0;
+  rows.forEach((tr,i)=>{
+    const inputs = tr.querySelectorAll('input');
+    const qty = parseFloat(inputs[1]?.value)||0;
+    const price = parseFloat(inputs[2]?.value)||0;
+    const disc = parseFloat(inputs[3]?.value)||0;
+    const lineInc = qty*price;
+    const discAmt = lineInc*disc/100;
+    const lineNet = lineInc - discAmt;
+    totalInc += lineInc;
+    totalDisc += discAmt;
+    const ltEl = tr.querySelector('[id^="lt_"]');
+    if(ltEl) ltEl.textContent = lineNet>0 ? fmt(lineNet) : '';
+  });
+  const total = totalInc - totalDisc;
+  const beforeVat = total/1.07;
+  const vat = total - beforeVat;
+  document.getElementById('sumDisc').textContent = totalDisc>0 ? fmt(totalDisc) : '0.00';
+  document.getElementById('sumBefore').textContent = fmt(beforeVat);
+  document.getElementById('sumVat').textContent = fmt(vat);
+  document.getElementById('sumTotal').textContent = fmt(total);
+  document.getElementById('wordsDisplay').textContent = '('+numToThai(total)+')';
+}
+
+function numToThai(num){
+  if(num===0) return 'ศูนย์บาทถ้วน';
+  const ones=['','หนึ่ง','สอง','สาม','สี่','ห้า','หก','เจ็ด','แปด','เก้า'];
+  function conv(n){
+    if(n===0) return '';
+    if(n<10) return ones[n];
+    let digits=[],tmp=n;
+    while(tmp>0){digits.unshift(tmp%10);tmp=Math.floor(tmp/10);}
+    let res='';
+    for(let i=0;i<digits.length;i++){
+      const pl=digits.length-1-i;
+      if(digits[i]===0) continue;
+      const plNames=['','สิบ','ร้อย','พัน','หมื่น','แสน','ล้าน'];
+      if(pl===1&&digits[i]===1) res+='สิบ';
+      else if(pl===1&&digits[i]===2) res+='ยี่สิบ';
+      else res+=ones[digits[i]]+plNames[pl];
+    }
+    return res;
+  }
+  const intP=Math.floor(num);
+  const decP=Math.round((num-intP)*100);
+  let r=conv(intP)+'บาท';
+  if(decP>0) r+=conv(decP)+'สตางค์';
+  else r+='ถ้วน';
+  return r;
+}
+
+function clearForm(){
+  if(!confirm('ล้างข้อมูลทั้งหมด?')) return;
+  document.getElementById('custName').value='';
+  document.getElementById('custAddr').value='';
+  document.getElementById('custTax').value='';
+  document.getElementById('approver').value='';
+  document.getElementById('itemsBody').innerHTML='';
+  rowCount=0;
+  recalc();
+}
+
+// Init with some empty rows
+for(let i=0;i<12;i++) addRow();
+</script>
+</body>
+</html>
