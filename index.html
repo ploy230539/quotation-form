@@ -143,7 +143,7 @@
         <th class="col-qty">จำนวน</th>
         <th class="col-price">ราคา/หน่วย</th>
         <th class="col-disc">ส่วนลด %</th>
-        <th class="col-total">จำนวนเงิน (บาท)</th>
+        <th class="col-total">จำนวนเงิน (บาท) <label style="font-weight:normal;font-size:11px;cursor:pointer;"><input type="checkbox" id="roundUp" onchange="recalc()"> ปัดเศษ</label></th>
         <th class="col-act no-print"></th>
       </tr>
     </thead>
@@ -251,6 +251,7 @@ function delRow(id){
 function fmt(n){ return n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
 function recalc(){
+  const doRound = document.getElementById('roundUp').checked;
   const rows = document.querySelectorAll('#itemsBody tr');
   let totalInc=0, totalDisc=0;
   rows.forEach((tr,i)=>{
@@ -260,13 +261,15 @@ function recalc(){
     const disc = parseFloat(inputs[3]?.value)||0;
     const lineInc = qty*price;
     const discAmt = lineInc*disc/100;
-    const lineNet = lineInc - discAmt;
+    let lineNet = lineInc - discAmt;
+    if(doRound) lineNet = Math.ceil(lineNet);
     totalInc += lineInc;
     totalDisc += discAmt;
     const ltEl = tr.querySelector('[id^="lt_"]');
     if(ltEl) ltEl.textContent = lineNet>0 ? fmt(lineNet) : '';
   });
-  const total = totalInc - totalDisc;
+  let total = totalInc - totalDisc;
+  if(doRound) total = Math.ceil(total);
   const beforeVat = total/1.07;
   const vat = total - beforeVat;
   document.getElementById('sumDisc').textContent = totalDisc>0 ? fmt(totalDisc) : '0.00';
